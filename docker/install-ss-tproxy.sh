@@ -12,20 +12,19 @@ exiterr2() { exiterr "'yum install' failed."; }
 bigecho()  { echo; echo -e "\033[36m $1 \033[0m"; }
 
 # Disable FireWall
-bigecho "Disable Firewall..."
-systemctl stop firewalld.service
-systemctl disable firewalld.service
+# bigecho "Disable Firewall..."
+# systemctl stop firewalld.service
+# systemctl disable firewalld.service
 
 # Install Lib
 bigecho "Install Library, Pleast wait..."
-yum -y install git gettext gcc autoconf libtool automake make asciidoc xmlto c-ares-devel libev-devel \
-  openssl-devel net-tools curl ipset libcurl-devel iproute perl wget gcc bind-utils vim || exiterr2
-
-yum -y install epel-release || exiterr2
-
+yum -y install epel-release initscripts.x86_64 || exiterr2
+yum provides '*/applydeltarpm' 
+yum -y install deltarpm  
+yum -y install git gettext gcc autoconf libtool automake make asciidoc xmlto c-ares-devel libev-devel openssl-devel net-tools curl ipset libcurl-devel iproute perl wget gcc bind-utils vim || exiterr2
 
 # 查找 TPROXY 模块
-find /lib/modules/$(uname -r) -type f -name '*.ko*' | grep 'xt_TPROXY'
+# find /lib/modules/$(uname -r) -type f -name '*.ko*' | grep 'xt_TPROXY'
 # Install haveged
 if ! type haveged 2>/dev/null; then
     bigecho "Install Haveged, Pleast wait..."
@@ -33,8 +32,6 @@ if ! type haveged 2>/dev/null; then
     HAVEGED_URL="http://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/h/haveged-$HAVEGED_VER.el7.x86_64.rpm"
     yum -y install "$HAVEGED_URL" || exiterr2
     # yum -y install haveged || exiterr2
-    systemctl start haveged
-    systemctl enable haveged
 fi
 
 # Install dnsmasq
@@ -100,7 +97,7 @@ if ! type ss-redir 2>/dev/null; then
     pushd shadowsocks-libev
     git submodule update --init --recursive
 	./autogen.sh && ./configure && make
-	sudo make install
+	make install
     popd
 fi
 
@@ -114,32 +111,22 @@ if ! type ss-tproxy 2>/dev/null; then
     chown root:root /usr/local/bin/ss-tproxy /usr/local/bin/ss-switch
     chmod +x /usr/local/bin/ss-tproxy /usr/local/bin/ss-switch
     mkdir -m 0755 -p /etc/tproxy
-    cp -af chnroute.txt /etc/tproxy/
-    cp -af chnroute.ipset /etc/tproxy/
-    cp -af ss-tproxy.conf /etc/tproxy/
+    # cp -af chnroute.txt /etc/tproxy/
+    # cp -af chnroute.ipset /etc/tproxy/
+    # cp -af ss-tproxy.conf /etc/tproxy/
     chown -R root:root /etc/tproxy
-    chmod 0644 /etc/tproxy/*
+    # chmod 0644 /etc/tproxy/*
     popd
 
     # Systemctl
     pushd ss-tproxy
     cp -af ss-tproxy.service /etc/systemd/system/
     popd
-    systemctl daemon-reload
-    systemctl enable ss-tproxy.service
+    #systemctl daemon-reload
+    #systemctl enable ss-tproxy.service
 fi
 
 # Display info
 bigecho "#######################################################"
 bigecho "Please modify /etc/tproxy/ss-tproxy.conf before start."
-bigecho "#ss-tproxy update_chnip"
-#ss-tproxy update_chnip
-bigecho "#ss-tproxy start"
-#ss-tproxy start
-#bigecho "#######################################################"
-#bigecho "ss-tunnel 测试"
-#dig @127.0.0.1 -p60053 www.google.com
-#bigecho "国内 DNS 测试"
-#dig @114.114.114.114 -p53 www.baidu.com
-#bigecho "ss-redir 测试"
-#dig @208.67.222.222 -p443 www.google.com
+bigecho "#######################################################"
