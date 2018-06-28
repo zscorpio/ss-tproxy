@@ -1,0 +1,9 @@
+version: '1'
+services:
+  ss-tproxy:
+    build: '.'
+    privileged: true
+    volumes:
+      - ../config/:/etc/tproxy/
+    restart: always
+    container_name: ss-tproxy
