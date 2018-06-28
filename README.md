@@ -1,4 +1,4 @@
-# ss-redir 透明代理
+ii# ss-redir 透明代理
 > 如果你的 SS/SSR 不支持 UDP Relay，请使用 [TCPOnly 分支](https://github.com/zfl9/ss-tproxy/tree/tcponly)！
 
 ## 脚本依赖

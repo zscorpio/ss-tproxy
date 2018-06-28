@@ -135,6 +135,19 @@ function current_ip() {
 }
 
 function start() {
+    # 关闭防火墙
+    systemctl stop firewalld.service
+    systemctl disable firewalld.service
+
+
+    # 启动haveged
+    systemctl restart haveged
+    systemctl enable haveged
+
+    # 初始化
+    systemctl daemon-reload
+    systemctl enable ss-tproxy.service
+
     dns_origin
 
     if [ "${server_use_ssr}" = 'false' ]; then
